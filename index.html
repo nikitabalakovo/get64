@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>image</title>
+    <style>
+        body {
+            --text-opacity: 1;
+            color: #cbd5e0;
+            color: rgba(203, 213, 224, var(--text-opacity));
+            font-family: Nunito, sans-serif;
+            --bg-opacity: 1;
+            background-color: rgba(45, 55, 72, var(--bg-opacity));
+        }
+
+        div {
+            padding-top: 3.7px;
+            vertical-align: top;
+        }
+
+        input {
+            margin-right: 5px;
+        }
+
+        table {
+            text-align: left;
+        }
+
+        th {
+            padding-right: 20px;
+        }
+
+        td {
+            vertical-align: top;
+        }
+
+        button {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: inline-block;">
+        <table>
+            <tr>
+                <th>
+                    Трамваи:
+                </th>
+                <th>
+                    Троллейбусы:
+                </th>
+            </tr>
+            <tr>
+                <td id="trams">
+                    <div><label><input type="checkbox">2</label></div>
+                    <div><label><input type="checkbox">3</label></div>
+                    <div><label><input type="checkbox">4</label></div>
+                    <div><label><input type="checkbox">5</label></div>
+                    <div><label><input type="checkbox">6</label></div>
+                    <div><label><input type="checkbox">7</label></div>
+                    <div><label><input type="checkbox">8</label></div>
+                    <div><label><input type="checkbox">9</label></div>
+                    <div><label><input type="checkbox">10</label></div>
+                    <div><label><input type="checkbox">11</label></div>
+                </td>
+                <td id="trolls">
+                    <div><label><input type="checkbox">1</label></div>
+                    <div><label><input type="checkbox">2</label></div>
+                    <div><label><input type="checkbox">2а</label></div>
+                    <div><label><input type="checkbox">3</label></div>
+                    <div><label><input type="checkbox">4</label></div>
+                    <div><label><input type="checkbox">5</label></div>
+                    <div><label><input type="checkbox">7</label></div>
+                    <div><label><input type="checkbox">8</label></div>
+                    <div><label><input type="checkbox">9</label></div>
+                    <div><label><input type="checkbox">10</label></div>
+                    <div><label><input type="checkbox">11</label></div>
+                    <div><label><input type="checkbox">14</label></div>
+                    <div><label><input type="checkbox">15</label></div>
+                    <div><label><input type="checkbox">16</label></div>
+                </td>
+            </tr>
+        </table>
+        <button id="generate" onclick="render();">Сгенерировать изображение</button>
+        <br>
+        <button id="save" style="display: none;" onclick="save();">Сохранить изображение</button>
+    </div>
+    <canvas id='canvas' width="812" height="574" style="background-color: white; display: inline-block;">Обновите
+        браузер</canvas>
+    <script defer>
+        let generate_button = document.getElementById('generate');
+        generate_button.removeAttribute('disabled');
+        let save_button = document.getElementById('save');
+        function render() {
+            generate_button.setAttribute('disabled', '');
+            let canvas = document.getElementById('canvas');
+            let context = canvas.getContext('2d');
+            context.fillStyle = 'white';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            let leftMargin = 46;
+            let topMargin = 175;
+            let interval = 58;
+            let pic = new Image();
+            pic.src = 'header.jpg';
+            pic.onload = () => {
+                context.drawImage(pic, 0, 0);
+                pic = new Image();
+                pic.src = 'head.jpg';
+                pic.onload = () => {
+                    context.drawImage(pic, leftMargin, topMargin);
+                    topMargin += interval;
+                    let transport = ['trams', 'trolls'];
+                    let routes = {};
+                    transport.forEach((value) => {
+                        let input = document.getElementById(value).getElementsByTagName('input');
+                        let flag = 0;
+                        for (let i = 0; i < input.length; i++) {
+                            if (input[i].checked) {
+                                if (!routes[value]) routes[value] = [];
+                                routes[value].push(input[i].parentNode.innerText);
+                            }
+                        }
+                    });
+                    console.log(routes);
+                    let leftMargin_current;
+                    if (routes.trams) {
+                        pic = new Image();
+                        pic.src = 'trams.jpg';
+                        pic.onload = () => {
+                            context.drawImage(pic, leftMargin, topMargin);
+                            topMargin += interval;
+                            leftMargin_current = leftMargin;
+                            render_routes(routes.trams, 0, render_trolls)
+                        }
+                    } else render_trolls();
+
+                    function render_trolls() {
+                        if (routes.trolls) {
+                            pic = new Image();
+                            pic.src = 'trolls.jpg';
+                            pic.onload = () => {
+                                context.drawImage(pic, leftMargin, topMargin - 8);
+                                topMargin += interval;
+                                leftMargin_current = leftMargin;
+                                render_routes(routes.trolls, 0, () => {
+                                    generate_button.removeAttribute('disabled');
+                                    save_button.removeAttribute('style');
+                                });
+                            }
+                        } else {
+                            generate_button.removeAttribute('disabled');
+                            save_button.removeAttribute('style');
+                        }
+                    }
+
+                    function render_routes(routes_list, i, callback) {
+                        if (i > 0) {
+                            pic = new Image();
+                            pic.src = 'comma.jpg';
+                            pic.onload = () => {
+                                context.drawImage(pic, leftMargin_current + 4, topMargin + 26);
+                                leftMargin_current += 39;
+                                add_route();
+                            }
+                        } else add_route();
+                        function add_route() {
+                            pic = new Image();
+                            pic.src = routes_list[i] + '.jpg';
+                            pic.onload = () => {
+                                if (leftMargin_current + pic.width + 39 > canvas.width) {
+                                    topMargin += interval;
+                                    leftMargin_current = leftMargin;
+                                }
+                                context.drawImage(pic, leftMargin_current, topMargin);
+                                leftMargin_current += pic.width;
+                                if (i < routes_list.length - 1) render_routes(routes_list, i + 1, callback);
+                                else {
+                                    leftMargin_current += 23;
+                                    pic = new Image();
+                                    pic.src = routes_list.length == 1 ? 'route.jpg' : 'routes.jpg';
+                                    pic.onload = () => {
+                                        if (leftMargin_current + pic.width + 23 > canvas.width) {
+                                            topMargin += interval;
+                                            leftMargin_current = leftMargin;
+                                        }
+                                        context.drawImage(pic, leftMargin_current, topMargin);
+                                        topMargin += interval;
+                                        callback();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+        }
+        function save() {
+            const elem = document.createElement('a');
+            elem.setAttribute('download', "myImage.jpg");
+            elem.href = canvas.toDataURL("image/jpg");
+            elem.click();
+            elem.parentNode.removeChild(elem);
+        }
+    </script>
+</body>
+
+</html>
