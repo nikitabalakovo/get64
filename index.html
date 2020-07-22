@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>image</title>
+    <title>Трамваи и троллейбусы Саратова</title>
     <style>
         body {
             --text-opacity: 1;
@@ -93,10 +93,10 @@
         let generate_button = document.getElementById('generate');
         generate_button.removeAttribute('disabled');
         let save_button = document.getElementById('save');
+        let canvas = document.getElementById('canvas');
+        let context = canvas.getContext('2d');
         function render() {
             generate_button.setAttribute('disabled', '');
-            let canvas = document.getElementById('canvas');
-            let context = canvas.getContext('2d');
             context.fillStyle = 'white';
             context.fillRect(0, 0, canvas.width, canvas.height);
             let leftMargin = 46;
@@ -123,7 +123,6 @@
                             }
                         }
                     });
-                    console.log(routes);
                     let leftMargin_current;
                     if (routes.trams) {
                         pic = new Image();
@@ -133,7 +132,7 @@
                             topMargin += interval;
                             leftMargin_current = leftMargin;
                             render_routes(routes.trams, 0, render_trolls)
-                        }
+                        };
                     } else render_trolls();
 
                     function render_trolls() {
@@ -148,7 +147,7 @@
                                     generate_button.removeAttribute('disabled');
                                     save_button.removeAttribute('style');
                                 });
-                            }
+                            };
                         } else {
                             generate_button.removeAttribute('disabled');
                             save_button.removeAttribute('style');
@@ -163,7 +162,7 @@
                                 context.drawImage(pic, leftMargin_current + 4, topMargin + 26);
                                 leftMargin_current += 39;
                                 add_route();
-                            }
+                            };
                         } else add_route();
                         function add_route() {
                             pic = new Image();
@@ -188,20 +187,19 @@
                                         context.drawImage(pic, leftMargin_current, topMargin);
                                         topMargin += interval;
                                         callback();
-                                    }
+                                    };
                                 }
-                            }
+                            };
                         }
                     }
                 };
-            }
+            };
         }
         function save() {
             const elem = document.createElement('a');
-            elem.setAttribute('download', "myImage.jpg");
+            elem.setAttribute('download', "infoImage.jpg");
             elem.href = canvas.toDataURL("image/jpg");
             elem.click();
-            elem.parentNode.removeChild(elem);
         }
     </script>
 </body>
